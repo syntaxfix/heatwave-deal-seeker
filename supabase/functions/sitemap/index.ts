@@ -20,6 +20,7 @@ serve(async (req: Request) => {
     const url = new URL(req.url);
     let sitemapType = url.searchParams.get('type') || 'index';
     let page = parseInt(url.searchParams.get('page') || '1');
+    let baseUrl = url.origin; // fallback to function origin
     
     // Handle POST requests with body parameters
     if (req.method === 'POST') {
@@ -27,6 +28,7 @@ serve(async (req: Request) => {
         const body = await req.json();
         sitemapType = body.type || sitemapType;
         page = parseInt(body.page || page);
+        baseUrl = body.baseUrl || baseUrl; // Use provided baseUrl
       } catch (e) {
         // If JSON parsing fails, fall back to URL params
       }
@@ -34,8 +36,6 @@ serve(async (req: Request) => {
     
     const limit = 1000;
     const offset = (page - 1) * limit;
-
-    const baseUrl = url.origin;
 
     if (sitemapType === 'index') {
       // Generate sitemap index

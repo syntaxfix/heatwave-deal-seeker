@@ -14,7 +14,9 @@ const SitemapRedirect = () => {
         const searchParams = new URLSearchParams(location.search);
         
         // Build parameters for the edge function
-        const params: Record<string, string> = {};
+        const params: Record<string, string> = {
+          baseUrl: window.location.origin // Pass the actual website URL
+        };
         
         if (type) {
           params.type = type;
