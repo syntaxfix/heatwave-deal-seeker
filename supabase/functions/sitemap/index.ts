@@ -18,8 +18,20 @@ serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    const sitemapType = url.searchParams.get('type') || 'index';
-    const page = parseInt(url.searchParams.get('page') || '1');
+    let sitemapType = url.searchParams.get('type') || 'index';
+    let page = parseInt(url.searchParams.get('page') || '1');
+    
+    // Handle POST requests with body parameters
+    if (req.method === 'POST') {
+      try {
+        const body = await req.json();
+        sitemapType = body.type || sitemapType;
+        page = parseInt(body.page || page);
+      } catch (e) {
+        // If JSON parsing fails, fall back to URL params
+      }
+    }
+    
     const limit = 1000;
     const offset = (page - 1) * limit;
 
@@ -69,11 +81,11 @@ async function generateSitemapIndex(baseUrl: string): Promise<string> {
 
   let sitemaps = [
     `    <sitemap>
-      <loc>${baseUrl}/api/sitemap?type=static</loc>
+      <loc>${baseUrl}/sitemap-static.xml</loc>
       <lastmod>${new Date().toISOString()}</lastmod>
     </sitemap>`,
     `    <sitemap>
-      <loc>${baseUrl}/api/sitemap?type=blogs</loc>
+      <loc>${baseUrl}/sitemap-blogs.xml</loc>
       <lastmod>${new Date().toISOString()}</lastmod>
     </sitemap>`,
   ];
@@ -82,7 +94,7 @@ async function generateSitemapIndex(baseUrl: string): Promise<string> {
   const dealPages = Math.ceil(dealsTotal / limit);
   for (let i = 1; i <= dealPages; i++) {
     sitemaps.push(`    <sitemap>
-      <loc>${baseUrl}/api/sitemap?type=deals&page=${i}</loc>
+      <loc>${baseUrl}/sitemap-deals.xml?page=${i}</loc>
       <lastmod>${new Date().toISOString()}</lastmod>
     </sitemap>`);
   }
@@ -91,7 +103,7 @@ async function generateSitemapIndex(baseUrl: string): Promise<string> {
   const shopPages = Math.ceil(shopsTotal / limit);
   for (let i = 1; i <= shopPages; i++) {
     sitemaps.push(`    <sitemap>
-      <loc>${baseUrl}/api/sitemap?type=shops&page=${i}</loc>
+      <loc>${baseUrl}/sitemap-shops.xml?page=${i}</loc>
       <lastmod>${new Date().toISOString()}</lastmod>
     </sitemap>`);
   }
