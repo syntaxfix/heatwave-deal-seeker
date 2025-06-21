@@ -60,7 +60,7 @@ const DealListings = ({
     fetchDeals(true);
   }, [categorySlug, shopSlug, sortBy, searchQuery]);
 
-  const fetchDeals = async (initialLoad = false) => {
+  const fetchDeals = async (initialLoad = false, customPage?: number) => {
     if (initialLoad) {
       setPage(1);
       setHasMore(true);
@@ -136,7 +136,7 @@ const DealListings = ({
         query = query.order('created_at', { ascending: false });
     }
 
-    const currentPage = initialLoad ? 1 : page;
+    const currentPage = initialLoad ? 1 : (customPage || page);
     query = query.range((currentPage - 1) * 12, currentPage * 12 - 1);
 
     const { data, error } = await query;
@@ -167,8 +167,9 @@ const DealListings = ({
   };
 
   const loadMoreDeals = async () => {
-    setPage((prevPage) => prevPage + 1);
-    await fetchDeals();
+    const nextPage = page + 1;
+    setPage(nextPage);
+    await fetchDeals(false, nextPage);
   };
 
   const renderDealCard = (deal: Deal) => {

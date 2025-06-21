@@ -12,6 +12,7 @@ import TagPage from "./pages/TagPage";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import { CurrencyProvider } from "./hooks/useCurrency";
+import SitemapRedirect from "./components/SitemapRedirect";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,10 @@ const App = () => (
                 <Route path="/tag/:slug" element={<TagPage />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/page/:slug" element={navItems.find(item => item.to === "/page/:slug")?.page} />
+                
+                {/* Sitemap routes - redirect to edge function */}
+                <Route path="/sitemap.xml" element={<SitemapRedirect />} />
+                <Route path="/sitemap-:type.xml" element={<SitemapRedirect />} />
               </Routes>
             </div>
             <Footer />
