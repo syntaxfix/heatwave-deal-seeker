@@ -32,13 +32,27 @@ import {
 import { useState } from 'react';
 import { BlogPostForm } from './BlogPostForm';
 import { toast } from 'sonner';
+import { AdminSearch } from './AdminSearch';
+import { AdminPagination } from './AdminPagination';
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row'];
 
-async function fetchBlogPosts() {
-  const { data, error } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
+async function fetchBlogPosts(searchQuery: string, page: number, itemsPerPage: number) {
+  let query = supabase.from('blog_posts').select('*', { count: 'exact' });
+
+  if (searchQuery) {
+    query = query.ilike('title', `%${searchQuery}%`);
+  }
+
+  const from = (page - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
+
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
   if (error) throw new Error(error.message);
-  return data;
+  return { data: data || [], count: count || 0 };
 }
 
 async function deleteBlogPost(postId: string) {
@@ -48,7 +62,18 @@ async function deleteBlogPost(postId: string) {
 
 export const BlogPostsAdmin = () => {
   const queryClient = useQueryClient();
-  const { data: posts, isLoading, error } = useQuery({ queryKey: ['blogPostsAdmin'], queryFn: fetchBlogPosts });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  const { data: result, isLoading, error } = useQuery({
+    queryKey: ['blogPostsAdmin', searchQuery, currentPage, itemsPerPage],
+    queryFn: () => fetchBlogPosts(searchQuery, currentPage, itemsPerPage)
+  });
+
+  const posts = result?.data || [];
+  const totalItems = result?.count || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -90,6 +115,20 @@ export const BlogPostsAdmin = () => {
     }
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   if (isLoading) return <div>Loading blog posts...</div>;
   if (error) return <div>Error loading blog posts: {error.message}</div>;
 
@@ -104,49 +143,66 @@ export const BlogPostsAdmin = () => {
           </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created At</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts?.map((post: BlogPost) => (
-                <TableRow key={post.id}>
-                  <TableCell className="font-medium">{post.title}</TableCell>
-                  <TableCell>
-                    <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                      {post.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{post.created_at ? new Date(post.created_at).toLocaleDateString() : 'N/A'}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(post)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteConfirmation(post)} className="text-red-600 focus:text-red-600">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          <div className="space-y-4">
+            <AdminSearch
+              placeholder="Search blog posts..."
+              onSearch={handleSearch}
+              className="w-full sm:w-80"
+            />
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {posts?.map((post: BlogPost) => (
+                  <TableRow key={post.id}>
+                    <TableCell className="font-medium">{post.title}</TableCell>
+                    <TableCell>
+                      <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
+                        {post.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{post.created_at ? new Date(post.created_at).toLocaleDateString() : 'N/A'}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEdit(post)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteConfirmation(post)} className="text-red-600 focus:text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <AdminPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+          </div>
         </CardContent>
       </Card>
       

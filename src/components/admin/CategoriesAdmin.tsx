@@ -38,24 +38,45 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Database } from '@/integrations/supabase/types';
+import { AdminSearch } from './AdminSearch';
+import { AdminPagination } from './AdminPagination';
 
 type Category = Database['public']['Tables']['categories']['Row'];
 
-const fetchCategories = async () => {
-  const { data, error } = await supabase.from('categories').select('*').order('created_at', { ascending: false });
+const fetchCategories = async (searchQuery: string, page: number, itemsPerPage: number) => {
+  let query = supabase.from('categories').select('*', { count: 'exact' });
+
+  if (searchQuery) {
+    query = query.ilike('name', `%${searchQuery}%`);
+  }
+
+  const from = (page - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
+
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
   if (error) throw new Error(error.message);
-  return data;
+  return { data: data || [], count: count || 0 };
 };
 
 export const CategoriesAdmin = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
-  const { data: categories, isLoading, error } = useQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: fetchCategories,
+  const { data: result, isLoading, error } = useQuery({
+    queryKey: ['categories', searchQuery, currentPage, itemsPerPage],
+    queryFn: () => fetchCategories(searchQuery, currentPage, itemsPerPage),
   });
+
+  const categories = result?.data || [];
+  const totalItems = result?.count || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -85,6 +106,20 @@ export const CategoriesAdmin = () => {
     deleteMutation.mutate(id);
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   if (isLoading) {
     return <div className="flex justify-center items-center p-4"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
@@ -100,6 +135,14 @@ export const CategoriesAdmin = () => {
         <Button onClick={handleCreate}>
           <PlusCircle className="mr-2 h-4 w-4" /> Create Category
         </Button>
+      </div>
+
+      <div className="mb-4">
+        <AdminSearch
+          placeholder="Search categories..."
+          onSearch={handleSearch}
+          className="w-full sm:w-80"
+        />
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -171,6 +214,15 @@ export const CategoriesAdmin = () => {
           </TableBody>
         </Table>
       </div>
+
+      <AdminPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+      />
     </div>
   );
 };

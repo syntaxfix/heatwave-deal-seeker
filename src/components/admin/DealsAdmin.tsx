@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,29 +22,50 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { AdminSearch } from './AdminSearch';
+import { AdminPagination } from './AdminPagination';
 
 type Deal = Database['public']['Tables']['deals']['Row'];
 type DealStatus = 'all' | 'pending' | 'approved' | 'rejected';
 
-async function fetchDeals(status: DealStatus) {
-  let query = supabase.from('deals').select('*').order('created_at', { ascending: false });
+async function fetchDeals(status: DealStatus, searchQuery: string, page: number, itemsPerPage: number) {
+  let query = supabase.from('deals').select('*', { count: 'exact' });
 
   if (status !== 'all') {
     query = query.eq('status', status);
   }
 
-  const { data, error } = await query;
+  if (searchQuery) {
+    query = query.ilike('title', `%${searchQuery}%`);
+  }
+
+  const from = (page - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
+
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
   if (error) throw new Error(error.message);
-  return data;
+  return { data: data || [], count: count || 0 };
 }
 
 export const DealsAdmin = () => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<DealStatus>('all');
-  const { data: deals, isLoading, error } = useQuery({
-    queryKey: ['deals', statusFilter],
-    queryFn: () => fetchDeals(statusFilter),
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  
+  const { data: result, isLoading, error } = useQuery({
+    queryKey: ['deals', statusFilter, searchQuery, currentPage, itemsPerPage],
+    queryFn: () => fetchDeals(statusFilter, searchQuery, currentPage, itemsPerPage),
   });
+
+  const deals = result?.data || [];
+  const totalItems = result?.count || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
@@ -94,6 +116,20 @@ export const DealsAdmin = () => {
     setIsAlertOpen(true);
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   if (isLoading) return <div>Loading deals...</div>;
   if (error) return <div>Error loading deals: {error.message}</div>;
 
@@ -104,58 +140,81 @@ export const DealsAdmin = () => {
         <Button onClick={openFormForCreate}>Create Deal</Button>
       </CardHeader>
       <CardContent>
-        <Tabs value={statusFilter} onValueChange={(value) => setStatusFilter(value as DealStatus)}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {deals?.map((deal) => (
-              <TableRow key={deal.id}>
-                <TableCell className="font-medium">{deal.title}</TableCell>
-                <TableCell>
-                  <Badge variant={
-                    deal.status === 'approved' ? 'default' :
-                    deal.status === 'rejected' ? 'destructive' :
-                    'secondary'
-                  }>
-                    {deal.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>${deal.discounted_price}</TableCell>
-                <TableCell className="flex gap-2 justify-end">
-                  {deal.status === 'pending' && (
-                    <>
-                      <Button size="sm" onClick={() => handleDealAction(deal.id, 'approved')} disabled={!!actioningDealId} className="bg-green-600 hover:bg-green-700">
-                        {actioningDealId === deal.id ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />}
-                        Approve
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDealAction(deal.id, 'rejected')} disabled={!!actioningDealId}>
-                        {actioningDealId === deal.id ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <X className="h-4 w-4 mr-1" />}
-                        Reject
-                      </Button>
-                    </>
-                  )}
-                  <Button variant="outline" size="icon" onClick={() => openFormForEdit(deal)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="destructive" size="icon" onClick={() => openAlertForDelete(deal)}><Trash2 className="h-4 w-4" /></Button>
-                </TableCell>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <Tabs value={statusFilter} onValueChange={(value) => {
+              setStatusFilter(value as DealStatus);
+              setCurrentPage(1);
+            }}>
+              <TabsList>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="approved">Approved</TabsTrigger>
+                <TabsTrigger value="rejected">Rejected</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <AdminSearch
+              placeholder="Search deals..."
+              onSearch={handleSearch}
+              className="w-full sm:w-80"
+            />
+          </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {deals?.map((deal) => (
+                <TableRow key={deal.id}>
+                  <TableCell className="font-medium">{deal.title}</TableCell>
+                  <TableCell>
+                    <Badge variant={
+                      deal.status === 'approved' ? 'default' :
+                      deal.status === 'rejected' ? 'destructive' :
+                      'secondary'
+                    }>
+                      {deal.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>${deal.discounted_price}</TableCell>
+                  <TableCell className="flex gap-2 justify-end">
+                    {deal.status === 'pending' && (
+                      <>
+                        <Button size="sm" onClick={() => handleDealAction(deal.id, 'approved')} disabled={!!actioningDealId} className="bg-green-600 hover:bg-green-700">
+                          {actioningDealId === deal.id ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />}
+                          Approve
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDealAction(deal.id, 'rejected')} disabled={!!actioningDealId}>
+                          {actioningDealId === deal.id ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <X className="h-4 w-4 mr-1" />}
+                          Reject
+                        </Button>
+                      </>
+                    )}
+                    <Button variant="outline" size="icon" onClick={() => openFormForEdit(deal)}><Pencil className="h-4 w-4" /></Button>
+                    <Button variant="destructive" size="icon" onClick={() => openAlertForDelete(deal)}><Trash2 className="h-4 w-4" /></Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          <AdminPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        </div>
       </CardContent>
+      
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{selectedDeal ? 'Edit Deal' : 'Create Deal'}</DialogTitle></DialogHeader>

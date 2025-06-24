@@ -1,145 +1,186 @@
 
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState } from "react";
+import { Menu, X, User, LogIn, UserPlus, LogOut, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate, Link } from "react-router-dom";
+import SearchBar from "./SearchBar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Search, Plus, Flame, User, Settings, LogOut } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
-  const { user, signOut } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      console.log('Searching for:', searchQuery);
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      toast.error("Error logging out");
     }
   };
 
-  const handlePostDeal = () => {
-    if (!user) {
-      navigate('/auth', { state: { from: { pathname: '/post-deal' } } });
+  const handleAdminClick = () => {
+    if (profile?.role === 'root_admin') {
+      navigate('/root-dashboard');
     } else {
-      navigate('/post-deal');
+      navigate('/admin');
     }
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
   };
 
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - clickable to go home */}
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Flame className="h-6 w-6 text-primary" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">DealSpark</span>
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link to="/" className="text-2xl font-bold text-primary">
+              Spark.deals
+            </Link>
           </div>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-600 hover:text-gray-900 font-medium">
-              Home
+          {/* Search Bar - Hidden on mobile */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <SearchBar />
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link to="/deals" className="text-gray-600 hover:text-primary">
+              All Deals
             </Link>
-            <Link to="/deals" className="text-gray-600 hover:text-gray-900 font-medium">
-              Deals
+            <Link to="/categories" className="text-gray-600 hover:text-primary">
+              Categories
             </Link>
-            <Link to="/shops" className="text-gray-600 hover:text-gray-900 font-medium">
+            <Link to="/shops" className="text-gray-600 hover:text-primary">
               Shops
             </Link>
-            <Link to="/blog" className="text-gray-600 hover:text-gray-900 font-medium">
+            <Link to="/blog" className="text-gray-600 hover:text-primary">
               Blog
             </Link>
-            <Link to="/contact" className="text-gray-600 hover:text-gray-900 font-medium">
+            <Link to="/contact" className="text-gray-600 hover:text-primary">
               Contact
             </Link>
-          </nav>
-
-          {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <form onSubmit={handleSearch} className="w-full">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  type="text"
-                  placeholder="Search for deals..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 w-full"
-                />
-              </div>
-            </form>
-          </div>
-
-          {/* Right Side */}
-          <div className="flex items-center space-x-4">
-            {/* Post Deal Button */}
-            <Button onClick={handlePostDeal} variant="limited-time" className="hidden sm:flex">
-              <Plus className="h-4 w-4 mr-2" />
-              Post Deal
-            </Button>
-
-            {/* User Menu */}
+            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.user_metadata?.avatar_url} />
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    {profile?.username || profile?.full_name || "Profile"}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">
-                        {user.user_metadata?.full_name || 'User'}
-                      </p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Profile Settings
-                    </Link>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  <DropdownMenuItem onClick={() => navigate("/post-deal")}>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Post Deal
+                  </DropdownMenuItem>
+                  {(profile?.role === 'admin' || profile?.role === 'root_admin' || profile?.role === 'moderator') && (
+                    <DropdownMenuItem onClick={handleAdminClick}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Admin Panel
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
+                    Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="limited-time" asChild>
-                <Link to="/auth">Sign In</Link>
-              </Button>
+              <div className="flex items-center space-x-4">
+                <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </Button>
+                <Button size="sm" onClick={() => navigate("/signup")}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Sign Up
+                </Button>
+              </div>
             )}
+          </nav>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isOpen && (
+          <div className="md:hidden py-4 border-t">
+            {/* Mobile Search */}
+            <div className="mb-4">
+              <SearchBar />
+            </div>
+            
+            <nav className="flex flex-col space-y-4">
+              <Link to="/deals" className="text-gray-600 hover:text-primary">
+                All Deals
+              </Link>
+              <Link to="/categories" className="text-gray-600 hover:text-primary">
+                Categories
+              </Link>
+              <Link to="/shops" className="text-gray-600 hover:text-primary">
+                Shops
+              </Link>
+              <Link to="/blog" className="text-gray-600 hover:text-primary">
+                Blog
+              </Link>
+              <Link to="/contact" className="text-gray-600 hover:text-primary">
+                Contact
+              </Link>
+              
+              {user ? (
+                <>
+                  <Link to="/profile" className="text-gray-600 hover:text-primary">
+                    Profile
+                  </Link>
+                  <Link to="/post-deal" className="text-gray-600 hover:text-primary">
+                    Post Deal
+                  </Link>
+                  {(profile?.role === 'admin' || profile?.role === 'root_admin' || profile?.role === 'moderator') && (
+                    <button onClick={handleAdminClick} className="text-left text-gray-600 hover:text-primary">
+                      Admin Panel
+                    </button>
+                  )}
+                  <button onClick={handleLogout} className="text-left text-gray-600 hover:text-primary">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-gray-600 hover:text-primary">
+                    Login
+                  </Link>
+                  <Link to="/signup" className="text-gray-600 hover:text-primary">
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );

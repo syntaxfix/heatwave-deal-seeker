@@ -22,31 +22,50 @@ import {
 import { CouponForm } from './CouponForm';
 import { Badge } from '@/components/ui/badge';
 import { TableSkeleton } from './TableSkeleton';
+import { AdminSearch } from './AdminSearch';
+import { AdminPagination } from './AdminPagination';
 
-const fetchCoupons = async () => {
-  const { data, error } = await supabase
+const fetchCoupons = async (searchQuery: string, page: number, itemsPerPage: number) => {
+  let query = supabase
     .from('coupons')
     .select(`
       *,
       shops (name)
-    `)
-    .order('created_at', { ascending: false });
+    `, { count: 'exact' });
+
+  if (searchQuery) {
+    query = query.ilike('title', `%${searchQuery}%`);
+  }
+
+  const from = (page - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
+
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   if (error) {
     throw new Error(error.message);
   }
-  return data;
+  return { data: data || [], count: count || 0 };
 };
 
 export const CouponsAdmin = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
-  const { data: coupons, isLoading } = useQuery({
-    queryKey: ['coupons'],
-    queryFn: fetchCoupons
+  const { data: result, isLoading } = useQuery({
+    queryKey: ['coupons', searchQuery, currentPage, itemsPerPage],
+    queryFn: () => fetchCoupons(searchQuery, currentPage, itemsPerPage)
   });
+
+  const coupons = result?.data || [];
+  const totalItems = result?.count || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handleDelete = async (couponId: string) => {
     if (!window.confirm('Are you sure you want to delete this coupon?')) return;
@@ -76,6 +95,20 @@ export const CouponsAdmin = () => {
     setSelectedCoupon(null);
   }
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -83,6 +116,14 @@ export const CouponsAdmin = () => {
         <Button onClick={handleAdd}>
           <PlusCircle className="mr-2 h-4 w-4" /> Add Coupon
         </Button>
+      </div>
+
+      <div className="mb-4">
+        <AdminSearch
+          placeholder="Search coupons..."
+          onSearch={handleSearch}
+          className="w-full sm:w-80"
+        />
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -144,6 +185,16 @@ export const CouponsAdmin = () => {
                 </TableBody>
                 </Table>
             </div>
+
+            <AdminPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+
             {coupons?.length === 0 && (
                 <div className="text-center py-10">
                 <p>No coupons found.</p>
