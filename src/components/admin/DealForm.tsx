@@ -69,6 +69,8 @@ export const DealForm = ({ initialData, onSuccess }: DealFormProps) => {
       description: '',
       image_url: '',
       affiliate_link: '',
+      category_id: '',
+      shop_id: '',
       meta_title: '',
       meta_description: '',
       meta_keywords: '',
@@ -78,24 +80,30 @@ export const DealForm = ({ initialData, onSuccess }: DealFormProps) => {
 
   useEffect(() => {
     if (initialData) {
-      form.reset({
-        ...initialData,
-        description: initialData.description ?? '',
-        image_url: initialData.image_url ?? '',
-        affiliate_link: initialData.affiliate_link ?? '',
+      const formData = {
+        title: initialData.title || '',
+        description: initialData.description || '',
+        image_url: initialData.image_url || '',
+        affiliate_link: initialData.affiliate_link || '',
         original_price: initialData.original_price ?? undefined,
+        discounted_price: initialData.discounted_price || 0,
+        category_id: initialData.category_id || '',
+        shop_id: initialData.shop_id || '',
         expires_at: initialData.expires_at ? new Date(initialData.expires_at).toISOString().substring(0, 16) : '',
-        meta_title: initialData.meta_title ?? '',
-        meta_description: initialData.meta_description ?? '',
-        meta_keywords: initialData.meta_keywords ?? '',
-        canonical_url: initialData.canonical_url ?? '',
-      });
+        meta_title: initialData.meta_title || '',
+        meta_description: initialData.meta_description || '',
+        meta_keywords: initialData.meta_keywords || '',
+        canonical_url: initialData.canonical_url || '',
+      };
+      form.reset(formData);
     } else {
       form.reset({
         title: '',
         description: '',
         image_url: '',
         affiliate_link: '',
+        category_id: '',
+        shop_id: '',
         meta_title: '',
         meta_description: '',
         meta_keywords: '',
@@ -199,7 +207,7 @@ export const DealForm = ({ initialData, onSuccess }: DealFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select onValueChange={field.onChange} value={field.value || ''}>
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
                   </FormControl>
@@ -217,7 +225,7 @@ export const DealForm = ({ initialData, onSuccess }: DealFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Shop</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select onValueChange={field.onChange} value={field.value || ''}>
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="Select a shop" /></SelectTrigger>
                   </FormControl>

@@ -13,6 +13,7 @@ import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import { CurrencyProvider } from "./hooks/useCurrency";
 import SitemapRedirect from "./components/SitemapRedirect";
+import { SubscribePopup } from "./components/SubscribePopup";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               </Routes>
             </div>
             <Footer />
+            <SubscribePopup />
           </div>
         </BrowserRouter>
       </CurrencyProvider>

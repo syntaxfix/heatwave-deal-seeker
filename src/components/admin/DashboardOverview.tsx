@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Tag, List, ShoppingBag, Newspaper, Package, FileText } from 'lucide-react';
+import { Users, Tag, List, ShoppingBag, Newspaper, Package, FileText, Mail } from 'lucide-react';
 
 const fetchCounts = async () => {
   const [
@@ -12,7 +12,8 @@ const fetchCounts = async () => {
     { count: tagsCount },
     { count: shopsCount },
     { count: blogPostsCount },
-    { count: staticPagesCount }
+    { count: staticPagesCount },
+    { count: subscribersCount }
   ] = await Promise.all([
     supabase.from('deals').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
@@ -21,6 +22,7 @@ const fetchCounts = async () => {
     supabase.from('shops').select('*', { count: 'exact', head: true }),
     supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
     supabase.from('static_pages').select('*', { count: 'exact', head: true }),
+    supabase.from('subscribers').select('*', { count: 'exact', head: true }).eq('is_active', true),
   ]);
 
   return {
@@ -31,6 +33,7 @@ const fetchCounts = async () => {
     shops: shopsCount ?? 0,
     blogPosts: blogPostsCount ?? 0,
     staticPages: staticPagesCount ?? 0,
+    subscribers: subscribersCount ?? 0,
   };
 };
 
@@ -57,10 +60,10 @@ export const DashboardOverview = () => {
     { title: 'Total Deals', value: counts?.deals, icon: Package },
     { title: 'Total Users', value: counts?.users, icon: Users },
     { title: 'Total Categories', value: counts?.categories, icon: List },
-    { title: 'Total Tags', value: counts?.tags, icon: Tag },
     { title: 'Total Shops', value: counts?.shops, icon: ShoppingBag },
     { title: 'Total Blog Posts', value: counts?.blogPosts, icon: Newspaper },
     { title: 'Total Static Pages', value: counts?.staticPages, icon: FileText },
+    { title: 'Active Subscribers', value: counts?.subscribers, icon: Mail },
   ];
 
   return (
