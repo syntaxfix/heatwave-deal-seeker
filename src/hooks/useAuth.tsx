@@ -1,10 +1,19 @@
+
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+interface Profile {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  role: string | null;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  profile: Profile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, metadata?: any) => Promise<{ error: any }>;
@@ -16,13 +25,29 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, username, full_name, role')
+      .eq('id', userId)
+      .single();
+    
+    if (!error && data) {
+      setProfile(data);
+    }
+  };
 
   useEffect(() => {
     // Get initial session first
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
       setLoading(false);
     });
 
@@ -35,6 +60,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           setSession(session);
           setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            fetchProfile(session.user.id);
+          } else {
+            setProfile(null);
+          }
         }
         
         // Don't update loading state for token refresh events
@@ -75,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     session,
+    profile,
     loading,
     signIn,
     signUp,

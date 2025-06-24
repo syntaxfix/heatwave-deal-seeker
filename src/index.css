@@ -114,18 +114,21 @@
     background: linear-gradient(135deg, #87CEEB 0%, #4A90E2 100%);
   }
 
-  /* Enhanced Limited Time Offers gradient - now available sitewide */
+  /* Enhanced Limited Time Offers gradient - pink rounded style from image */
   .limited-time-gradient {
-    background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+    background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+    border-radius: 9999px;
   }
 
   /* Alternative limited time gradient variations for different contexts */
   .limited-time-gradient-light {
-    background: linear-gradient(135deg, #fecaca 0%, #f9a8d4 100%);
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 9999px;
   }
 
   .limited-time-gradient-dark {
     background: linear-gradient(135deg, #dc2626 0%, #be185d 100%);
+    border-radius: 9999px;
   }
 
   /* Hot deals banner - applies the red to pink gradient */
@@ -133,22 +136,44 @@
     background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
   }
 
-  /* Primary CTA gradient */
+  /* Primary CTA gradient - orange gradient style from image */
   .primary-cta-gradient {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    border-radius: 9999px;
   }
 
   /* Additional sitewide utility gradients */
   .success-gradient {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 9999px;
   }
 
   .warning-gradient {
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 9999px;
   }
 
   .info-gradient {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 9999px;
+  }
+
+  /* Default button gradient - primary orange style */
+  .default-gradient {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    border-radius: 9999px;
+  }
+
+  /* Secondary gradient - subtle gray */
+  .secondary-gradient {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    border-radius: 9999px;
+  }
+
+  /* Ghost button with subtle gradient background */
+  .ghost-gradient {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(234, 88, 12, 0.1) 100%);
+    border-radius: 9999px;
   }
 }
 

@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
+import { Facebook, Twitter, Instagram, Mail, Flame } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -9,7 +9,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-bold mb-4 text-white">Spark.deals</h3>
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Flame className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">Spark.deals</h3>
+            </div>
             <p className="text-gray-300 mb-4">
               Discover the best deals and discounts from top retailers. Save money on everything you love with our curated collection of offers.
             </p>

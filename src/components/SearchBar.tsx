@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 
 interface SearchBarProps {
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void;
   placeholder?: string;
 }
 
@@ -19,7 +19,9 @@ const SearchBar = ({ onSearch, placeholder = "Search deals..." }: SearchBarProps
     if (searchQuery.trim()) {
       // Navigate to search results page
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      onSearch(searchQuery);
+      if (onSearch) {
+        onSearch(searchQuery);
+      }
     }
   };
 

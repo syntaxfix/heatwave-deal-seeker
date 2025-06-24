@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Menu, X, User, LogIn, UserPlus, LogOut, Settings } from "lucide-react";
+import { Menu, X, User, LogIn, UserPlus, LogOut, Settings, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,8 +41,11 @@ const Header = () => {
     <header className="bg-white shadow-sm border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
+          {/* Logo with Flame Icon */}
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Flame className="h-6 w-6 text-primary" />
+            </div>
             <Link to="/" className="text-2xl font-bold text-primary">
               Spark.deals
             </Link>
@@ -53,21 +56,21 @@ const Header = () => {
             <SearchBar />
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/deals" className="text-gray-600 hover:text-primary">
+          {/* Desktop Navigation - Old Style */}
+          <nav className="hidden md:flex items-center space-x-4">
+            <Link to="/deals" className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md">
               All Deals
             </Link>
-            <Link to="/categories" className="text-gray-600 hover:text-primary">
+            <Link to="/categories" className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md">
               Categories
             </Link>
-            <Link to="/shops" className="text-gray-600 hover:text-primary">
+            <Link to="/shops" className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md">
               Shops
             </Link>
-            <Link to="/blog" className="text-gray-600 hover:text-primary">
+            <Link to="/blog" className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md">
               Blog
             </Link>
-            <Link to="/contact" className="text-gray-600 hover:text-primary">
+            <Link to="/contact" className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md">
               Contact
             </Link>
             
@@ -79,7 +82,7 @@ const Header = () => {
                     {profile?.username || profile?.full_name || "Profile"}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="bg-white border shadow-lg">
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="mr-2 h-4 w-4" />
                     Profile
@@ -101,12 +104,12 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
                 <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
                   <LogIn className="h-4 w-4 mr-2" />
                   Login
                 </Button>
-                <Button size="sm" onClick={() => navigate("/signup")}>
+                <Button variant="limited-time" size="sm" onClick={() => navigate("/signup")}>
                   <UserPlus className="h-4 w-4 mr-2" />
                   Sign Up
                 </Button>
@@ -134,46 +137,46 @@ const Header = () => {
               <SearchBar />
             </div>
             
-            <nav className="flex flex-col space-y-4">
-              <Link to="/deals" className="text-gray-600 hover:text-primary">
+            <nav className="flex flex-col space-y-2">
+              <Link to="/deals" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                 All Deals
               </Link>
-              <Link to="/categories" className="text-gray-600 hover:text-primary">
+              <Link to="/categories" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                 Categories
               </Link>
-              <Link to="/shops" className="text-gray-600 hover:text-primary">
+              <Link to="/shops" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                 Shops
               </Link>
-              <Link to="/blog" className="text-gray-600 hover:text-primary">
+              <Link to="/blog" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                 Blog
               </Link>
-              <Link to="/contact" className="text-gray-600 hover:text-primary">
+              <Link to="/contact" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                 Contact
               </Link>
               
               {user ? (
                 <>
-                  <Link to="/profile" className="text-gray-600 hover:text-primary">
+                  <Link to="/profile" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                     Profile
                   </Link>
-                  <Link to="/post-deal" className="text-gray-600 hover:text-primary">
+                  <Link to="/post-deal" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                     Post Deal
                   </Link>
                   {(profile?.role === 'admin' || profile?.role === 'root_admin' || profile?.role === 'moderator') && (
-                    <button onClick={handleAdminClick} className="text-left text-gray-600 hover:text-primary">
+                    <button onClick={handleAdminClick} className="text-left text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                       Admin Panel
                     </button>
                   )}
-                  <button onClick={handleLogout} className="text-left text-gray-600 hover:text-primary">
+                  <button onClick={handleLogout} className="text-left text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                     Logout
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="text-gray-600 hover:text-primary">
+                  <Link to="/login" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                     Login
                   </Link>
-                  <Link to="/signup" className="text-gray-600 hover:text-primary">
+                  <Link to="/signup" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                     Sign Up
                   </Link>
                 </>
