@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Clock, ExternalLink, Store } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -156,16 +157,21 @@ const DealCard = ({ deal }: DealCardProps) => {
 
           {/* Action Button */}
           {affiliate_link && (
-            <a
-              href={affiliate_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center space-x-2 transition-colors"
+            <Button
+              asChild
+              variant="limited-time"
+              className="w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <span>Get Deal</span>
-              <ExternalLink className="h-3 w-3" />
-            </a>
+              <a
+                href={affiliate_link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>Get Deal</span>
+                <ExternalLink className="h-3 w-3 ml-2" />
+              </a>
+            </Button>
           )}
         </div>
       </CardContent>
