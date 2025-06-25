@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,18 +17,29 @@ export const AdminSearch = ({
 }: AdminSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Debounce search
+  // Stable callback to prevent infinite re-renders
+  const stableOnSearch = useCallback(onSearch, [onSearch]);
+
+  // Debounce search with better control
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      onSearch(searchQuery);
+      console.log('AdminSearch: debounced search triggered with:', searchQuery);
+      stableOnSearch(searchQuery);
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, onSearch]);
+  }, [searchQuery, stableOnSearch]);
 
   const clearSearch = () => {
+    console.log('AdminSearch: clearing search');
     setSearchQuery('');
-    onSearch('');
+    // Don't call onSearch here, let the useEffect handle it
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log('AdminSearch: input changed to:', value);
+    setSearchQuery(value);
   };
 
   return (
@@ -37,7 +49,7 @@ export const AdminSearch = ({
         <Input
           placeholder={placeholder}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleInputChange}
           className="pl-10 pr-10"
         />
         {searchQuery && (
