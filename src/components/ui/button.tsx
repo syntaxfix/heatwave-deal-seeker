@@ -10,7 +10,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "default-gradient text-white hover:opacity-90 hover:shadow-lg rounded-full",
+        //default: "default-gradient text-white hover:opacity-90 hover:shadow-lg rounded-full",
+        default: "limited-time-gradient text-white hover:opacity-90 hover:shadow-lg rounded-full",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-full",
         secondary: "secondary-gradient text-white hover:opacity-90 hover:shadow-lg rounded-full",

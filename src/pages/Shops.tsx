@@ -180,7 +180,7 @@ const Shops = () => {
                     </div>
                     
                     <div className="flex space-x-2">
-                      <Button asChild className="flex-1">
+                      <Button asChild className="limited-time-gradient flex-1">
                         <Link to={`/shop/${shop.slug}`}>
                           View Deals
                         </Link>
