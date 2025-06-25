@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -128,14 +129,6 @@ export const SubscribersAdmin = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-  };
-
   const filteredSubscribers = subscribers?.filter(subscriber =>
     subscriber.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (subscriber.name && subscriber.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -157,9 +150,7 @@ export const SubscribersAdmin = () => {
           <div className="flex items-center space-x-2">
             <AdminSearch
               placeholder="Search subscribers..."
-              onSearch={handleSearch}
-              value={searchQuery}
-              onChange={handleSearchChange}
+              onSearch={setSearchQuery}
               className="w-64"
             />
             <Button onClick={exportSubscribers} variant="outline" size="sm">

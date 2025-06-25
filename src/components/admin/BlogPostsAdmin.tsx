@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,10 +120,6 @@ export const BlogPostsAdmin = () => {
     setCurrentPage(1);
   };
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-  };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -150,8 +147,6 @@ export const BlogPostsAdmin = () => {
             <AdminSearch
               placeholder="Search blog posts..."
               onSearch={handleSearch}
-              value={searchQuery}
-              onChange={handleSearchChange}
               className="w-full sm:w-80"
             />
 
