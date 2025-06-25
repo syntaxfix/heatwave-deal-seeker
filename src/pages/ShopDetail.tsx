@@ -408,7 +408,7 @@ const ShopDetail = () => {
           </Tabs>
           
           <div className={`mt-8 ${hasNoCoupons ? 'grid grid-cols-1' : 'grid grid-cols-1 lg:grid-cols-4'} gap-8`}>
-            <div className={hasNoCoupons ? 'col-span-1' : 'lg:col-span-3'}>
+            <div className={hasNoCoupons ? 'col-span-1' : 'lg:col-span-12'}>
               {shop.long_description && (
                 <Card>
                   <CardHeader>
@@ -423,7 +423,7 @@ const ShopDetail = () => {
               )}
             </div>
 
-            {!hasNoCoupons && (
+            {/*{!hasNoCoupons && (
               <div className="lg:col-span-1 space-y-8">
                 {otherShops.length > 0 && (
                     <Card>
@@ -449,7 +449,7 @@ const ShopDetail = () => {
                 {allCategories.length > 0 && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-xl">All Categories</CardTitle>
+                            <CardTitle className="text-xl">ZZAll Categories</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap gap-2">
@@ -465,11 +465,12 @@ const ShopDetail = () => {
                     </Card>
                 )}
               </div>
-            )}
+            )}*/}
           </div>
 
           {/* When no coupons, show related content in horizontal layout */}
-          {hasNoCoupons && (otherShops.length > 0 || allCategories.length > 0) && (
+          
+          {(
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
               {otherShops.length > 0 && (
                 <Card>

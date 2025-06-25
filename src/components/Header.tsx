@@ -31,9 +31,9 @@ const Header = () => {
 
   const handleAdminClick = () => {
     if (profile?.role === 'root_admin') {
-      navigate('/root-dashboard');
+      navigate('/root/dashboard');
     } else {
-      navigate('/admin');
+      navigate('/profile');
     }
   };
 
@@ -105,11 +105,11 @@ const Header = () => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
                   <LogIn className="h-4 w-4 mr-2" />
                   Login
                 </Button>
-                <Button variant="limited-time" size="sm" onClick={() => navigate("/signup")}>
+                <Button variant="limited-time" size="sm" onClick={() => navigate("/auth")}>
                   <UserPlus className="h-4 w-4 mr-2" />
                   Sign Up
                 </Button>
@@ -173,10 +173,10 @@ const Header = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
+                  <Link to="/auth" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                     Login
                   </Link>
-                  <Link to="/signup" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
+                  <Link to="/auth" className="text-gray-600 hover:text-primary py-2 px-3 rounded-md transition-colors">
                     Sign Up
                   </Link>
                 </>

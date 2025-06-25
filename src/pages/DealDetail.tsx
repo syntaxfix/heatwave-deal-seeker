@@ -79,7 +79,7 @@ const DealDetail = () => {
       }
 
       // Set meta tags
-      document.title = deal.meta_title || `${deal.title} - DealSpark`;
+      document.title = deal.meta_title || `${deal.title} - Spark.deals`;
       
       const metaDescriptionTag = document.querySelector('meta[name="description"]');
       if (metaDescriptionTag) {

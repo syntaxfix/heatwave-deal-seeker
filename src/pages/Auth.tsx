@@ -144,7 +144,7 @@ export default function Auth() {
         <div className="flex items-center justify-center mb-8">
           <Link to="/" className="flex items-center space-x-2">
             <ArrowLeft className="h-5 w-5 text-gray-600" />
-            <span className="text-gray-600">Back to DealSpark</span>
+            <span className="text-gray-600">Back to Spark.deals</span>
           </Link>
         </div>
         
@@ -155,7 +155,7 @@ export default function Auth() {
                 <Flame className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <CardTitle className="text-2xl">Welcome to DealSpark</CardTitle>
+            <CardTitle className="text-2xl">Welcome to Spark.deals</CardTitle>
             <CardDescription>Sign in to your account or create a new one</CardDescription>
           </CardHeader>
           <CardContent>

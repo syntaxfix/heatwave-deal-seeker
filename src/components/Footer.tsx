@@ -71,12 +71,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/page/privacy-policy" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/page/privacy" className="text-gray-300 hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/page/terms-of-service" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/page/terms" className="text-gray-300 hover:text-white transition-colors">
                   Terms of Service
                 </Link>
               </li>
@@ -89,10 +89,17 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-300">
-            © {new Date().getFullYear()} Spark.deals. All rights reserved.
-          </p>
+        
+        {/* Bottom Bar */}
+        <div className="border-t border-gray-800 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="text-gray-400 text-sm mb-4 md:mb-0">
+              © {new Date().getFullYear()} Spark.Deals. All rights reserved.
+            </div>
+            <div className="flex items-center space-x-4 text-sm text-gray-400">
+              <span>Made with ❤️ for deal hunters</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

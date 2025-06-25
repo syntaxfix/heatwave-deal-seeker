@@ -153,7 +153,7 @@ const Signup = () => {
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Create Account</CardTitle>
               <CardDescription>
-                Join DealSpark to share and discover amazing deals
+                Join Spark.deals to share and discover amazing deals
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

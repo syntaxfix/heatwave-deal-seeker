@@ -94,7 +94,7 @@ const BlogPost = () => {
 
     // Set document title and meta description
     if (postData) {
-      document.title = postData.meta_title || `${postData.title} - DealSpark Blog`;
+      document.title = postData.meta_title || `${postData.title} - Spark.deals Blog`;
       
       const metaDescriptionTag = document.querySelector('meta[name="description"]');
       if (metaDescriptionTag) {

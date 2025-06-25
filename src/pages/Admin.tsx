@@ -140,7 +140,7 @@ export default function Admin() {
     <ProtectedRoute requiredRole="admin" redirectTo="/login">
       <div className="min-h-screen bg-gray-50">
         <SEOHead 
-          title="Admin Dashboard - DealSpark"
+          title="Admin Dashboard - Spark.deals"
           description="Admin dashboard for managing deals, users, and site content."
         />
         <Header />

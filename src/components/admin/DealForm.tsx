@@ -207,7 +207,7 @@ export const DealForm = ({ initialData, onSuccess }: DealFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ''}>
+                <Select onValueChange={field.onChange} value={field.value ?? ''}>
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
                   </FormControl>
@@ -225,7 +225,7 @@ export const DealForm = ({ initialData, onSuccess }: DealFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Shop</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ''}>
+                <Select onValueChange={field.onChange} value={field.value ?? ''}>
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="Select a shop" /></SelectTrigger>
                   </FormControl>

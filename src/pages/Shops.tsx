@@ -66,12 +66,12 @@ const Shops = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEOHead 
-        title="All Shops - DealSpark | Browse Popular Stores"
-        description="Browse all shops and stores on DealSpark. Find deals from your favorite retailers and discover new brands with exclusive discounts."
+        title="All Shops - Spark.deals | Browse Popular Stores"
+        description="Browse all shops and stores on Spark.deals. Find deals from your favorite retailers and discover new brands with exclusive discounts."
         keywords="shops, stores, retailers, brands, deals, discounts"
         canonical={`${window.location.origin}/shops`}
-        ogTitle="All Shops - DealSpark"
-        ogDescription="Browse all shops and stores on DealSpark"
+        ogTitle="All Shops - Spark.deals"
+        ogDescription="Browse all shops and stores on Spark.deals"
         ogUrl={`${window.location.origin}/shops`}
         structuredData={{
           "@context": "https://schema.org",

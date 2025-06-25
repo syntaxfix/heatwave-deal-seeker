@@ -186,7 +186,7 @@ const Index = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "DealSpark",
+    "name": "Spark.deals",
     "description": "Find amazing deals, voted by our community of savvy shoppers. Save up to 90% on your favorite products.",
     "url": window.location.origin,
     "potentialAction": {
@@ -199,11 +199,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <SEOHead 
-        title={settings?.homepage_meta_title || "DealSpark - Find Amazing Deals & Coupons"}
+        title={settings?.homepage_meta_title || "Spark.deals - Find Amazing Deals & Coupons"}
         description={settings?.homepage_meta_description || "Discover hand-picked deals, voted by our community of savvy shoppers. Save up to 90% on your favorite products."}
         keywords={settings?.homepage_meta_keywords || "deals, coupons, discounts, shopping, savings"}
         canonical={window.location.origin}
-        ogTitle="DealSpark - Best Deals & Coupons Community"
+        ogTitle="Spark.deals - Best Deals & Coupons Community"
         ogDescription="Join thousands of deal hunters finding the best discounts and coupons online."
         ogUrl={window.location.href}
         structuredData={structuredData}

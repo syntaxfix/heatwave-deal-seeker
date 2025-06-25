@@ -46,11 +46,11 @@ const AllDeals = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEOHead 
-        title="All Deals - DealSpark | Hottest Deals & Discounts"
+        title="All Deals - Spark.deals | Hottest Deals & Discounts"
         description="Discover amazing deals from all categories and stores. Find the hottest discounts, voted by our community of deal hunters."
         keywords="deals, discounts, offers, savings, shopping, bargains"
         canonical={`${window.location.origin}/deals`}
-        ogTitle="All Deals - DealSpark"
+        ogTitle="All Deals - Spark.deals"
         ogDescription="Discover amazing deals from all categories and stores"
         ogUrl={`${window.location.origin}/deals`}
         structuredData={{

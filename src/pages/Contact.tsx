@@ -56,18 +56,18 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEOHead 
-        title="Contact Us - DealSpark | Get in Touch"
-        description="Contact DealSpark for support, partnerships, or general inquiries. We're here to help with all your deal hunting needs."
+        title="Contact Us - Spark.deals | Get in Touch"
+        description="Contact Spark.deals for support, partnerships, or general inquiries. We're here to help with all your deal hunting needs."
         keywords="contact, support, help, inquiries, partnerships"
         canonical={`${window.location.origin}/contact`}
-        ogTitle="Contact Us - DealSpark"
-        ogDescription="Get in touch with DealSpark"
+        ogTitle="Contact Us - Spark.deals"
+        ogDescription="Get in touch with Spark.deals"
         ogUrl={`${window.location.origin}/contact`}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "ContactPage",
-          "name": "Contact DealSpark",
-          "description": "Contact page for DealSpark",
+          "name": "Contact Spark.deals",
+          "description": "Contact page for Spark.deals",
           "url": `${window.location.origin}/contact`
         }}
       />
@@ -100,8 +100,8 @@ const Contact = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <a href="mailto:hello@dealspark.com" className="text-primary hover:underline">
-                      hello@dealspark.com
+                    <a href="mailto:hello@Spark.deals.com" className="text-primary hover:underline">
+                      hello@Spark.deals
                     </a>
                   </CardContent>
                 </Card>

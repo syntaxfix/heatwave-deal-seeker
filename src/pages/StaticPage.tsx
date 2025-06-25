@@ -103,18 +103,18 @@ const StaticPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEOHead 
-        title={page.meta_title || `${page.title} - DealSpark`}
-        description={page.meta_description || `Learn more about ${page.title} on DealSpark.`}
+        title={page.meta_title || `${page.title} - Spark.deals`}
+        description={page.meta_description || `Learn more about ${page.title} on Spark.deals.`}
         keywords={page.meta_keywords || undefined}
         canonical={page.canonical_url || `${window.location.origin}/${page.slug}`}
         ogTitle={page.meta_title || page.title}
-        ogDescription={page.meta_description || `Learn more about ${page.title} on DealSpark.`}
+        ogDescription={page.meta_description || `Learn more about ${page.title} on Spark.deals.`}
         ogUrl={`${window.location.origin}/${page.slug}`}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "WebPage",
           "name": page.title,
-          "description": page.meta_description || `Learn more about ${page.title} on DealSpark.`,
+          "description": page.meta_description || `Learn more about ${page.title} on Spark.deals.`,
           "url": `${window.location.origin}/${page.slug}`
         }}
       />

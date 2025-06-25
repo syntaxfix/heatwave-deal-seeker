@@ -46,7 +46,7 @@ const PostDeal = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate('/auth');
       return;
     }
     fetchOptions();

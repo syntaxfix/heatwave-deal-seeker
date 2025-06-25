@@ -90,17 +90,17 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEOHead 
-        title="Blog - DealSpark | Deal Hunting Tips & Shopping Guides"
+        title="Blog - Spark.deals | Deal Hunting Tips & Shopping Guides"
         description="Read our latest articles about deal hunting, shopping tips, and money-saving guides. Stay updated with the best deals and shopping strategies."
         keywords="blog, deal hunting, shopping tips, money saving, guides, articles"
         canonical={`${window.location.origin}/blog`}
-        ogTitle="Blog - DealSpark"
+        ogTitle="Blog - Spark.deals"
         ogDescription="Deal hunting tips and shopping guides"
         ogUrl={`${window.location.origin}/blog`}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "Blog",
-          "name": "DealSpark Blog",
+          "name": "Spark.deals Blog",
           "description": "Deal hunting tips and shopping guides",
           "url": `${window.location.origin}/blog`
         }}

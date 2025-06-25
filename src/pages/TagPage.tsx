@@ -155,7 +155,7 @@ const TagPage = () => {
       setPosts(postsWithProfiles);
       
       // Set page title
-      document.title = `${tagData.name} - Blog Tags - DealSpark`;
+      document.title = `${tagData.name} - Blog Tags - Spark.deals`;
     } catch (error) {
       console.error('Error in fetchTagAndPosts:', error);
     } finally {
