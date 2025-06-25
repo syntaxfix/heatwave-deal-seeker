@@ -8,14 +8,22 @@ interface AdminSearchProps {
   placeholder?: string;
   onSearch: (query: string) => void;
   className?: string;
+  value?: string; // Add controlled value prop
+  onChange?: (value: string) => void; // Add controlled onChange prop
 }
 
 export const AdminSearch = ({ 
   placeholder = "Search...", 
   onSearch, 
-  className = "" 
+  className = "",
+  value,
+  onChange
 }: AdminSearchProps) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [internalSearchQuery, setInternalSearchQuery] = useState('');
+  
+  // Use controlled value if provided, otherwise use internal state
+  const searchQuery = value !== undefined ? value : internalSearchQuery;
+  const setSearchQuery = onChange || setInternalSearchQuery;
 
   // Stable callback to prevent infinite re-renders
   const stableOnSearch = useCallback(onSearch, [onSearch]);
@@ -37,9 +45,9 @@ export const AdminSearch = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    console.log('AdminSearch: input changed to:', value);
-    setSearchQuery(value);
+    const inputValue = e.target.value;
+    console.log('AdminSearch: input changed to:', inputValue);
+    setSearchQuery(inputValue);
   };
 
   return (
