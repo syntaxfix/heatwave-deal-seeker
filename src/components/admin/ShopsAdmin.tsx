@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ShopForm } from './ShopForm';
 import { toast } from 'sonner';
 import { AdminSearch } from './AdminSearch';
@@ -42,6 +42,7 @@ interface ShopsResponse {
 }
 
 async function fetchShops(page: number, itemsPerPage: number, searchQuery: string): Promise<ShopsResponse> {
+  console.log('fetchShops called with:', { page, itemsPerPage, searchQuery });
   const offset = (page - 1) * itemsPerPage;
   
   let query = supabase
@@ -58,10 +59,14 @@ async function fetchShops(page: number, itemsPerPage: number, searchQuery: strin
   
   if (error) throw new Error(error.message);
   
-  return {
+  const result = {
     shops: data || [],
     totalCount: count || 0
   };
+  
+  console.log('fetchShops result:', { shopCount: result.shops.length, totalCount: result.totalCount, searchQuery });
+  
+  return result;
 }
 
 async function deleteShop(shopId: string) {
@@ -79,6 +84,11 @@ export const ShopsAdmin = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [shopToDelete, setShopToDelete] = useState<Shop | null>(null);
 
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log('ShopsAdmin state updated:', { currentPage, itemsPerPage, searchQuery });
+  }, [currentPage, itemsPerPage, searchQuery]);
+
   const { data: shopsData, isLoading, error } = useQuery({
     queryKey: ['shopsAdmin', currentPage, itemsPerPage, searchQuery],
     queryFn: () => fetchShops(currentPage, itemsPerPage, searchQuery),
@@ -87,6 +97,18 @@ export const ShopsAdmin = () => {
   const shops = shopsData?.shops || [];
   const totalCount = shopsData?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+  // Debug logging for query results
+  useEffect(() => {
+    if (shopsData) {
+      console.log('Query results received:', { 
+        shopCount: shops.length, 
+        totalCount, 
+        searchQuery,
+        isLoading 
+      });
+    }
+  }, [shopsData, shops.length, totalCount, searchQuery, isLoading]);
 
   const deleteMutation = useMutation({
     mutationFn: deleteShop,
@@ -124,6 +146,7 @@ export const ShopsAdmin = () => {
   };
 
   const handleSearch = (query: string) => {
+    console.log('handleSearch called with query:', query);
     setSearchQuery(query);
     setCurrentPage(1);
   };
@@ -158,6 +181,10 @@ export const ShopsAdmin = () => {
           </div>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 text-sm text-gray-600">
+            Showing {shops.length} of {totalCount} shops
+            {searchQuery && ` (filtered by: "${searchQuery}")`}
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
