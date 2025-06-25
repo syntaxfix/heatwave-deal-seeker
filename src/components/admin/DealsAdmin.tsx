@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -121,6 +120,10 @@ export const DealsAdmin = () => {
     setCurrentPage(1);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -156,6 +159,8 @@ export const DealsAdmin = () => {
             <AdminSearch
               placeholder="Search deals..."
               onSearch={handleSearch}
+              value={searchQuery}
+              onChange={handleSearchChange}
               className="w-full sm:w-80"
             />
           </div>
