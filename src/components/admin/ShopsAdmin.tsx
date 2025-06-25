@@ -31,13 +31,37 @@ import {
 import { useState } from 'react';
 import { ShopForm } from './ShopForm';
 import { toast } from 'sonner';
+import { AdminSearch } from './AdminSearch';
+import { AdminPagination } from './AdminPagination';
 
 type Shop = Database['public']['Tables']['shops']['Row'];
 
-async function fetchShops() {
-  const { data, error } = await supabase.from('shops').select('*').order('name', { ascending: true });
+interface ShopsResponse {
+  shops: Shop[];
+  totalCount: number;
+}
+
+async function fetchShops(page: number, itemsPerPage: number, searchQuery: string): Promise<ShopsResponse> {
+  const offset = (page - 1) * itemsPerPage;
+  
+  let query = supabase
+    .from('shops')
+    .select('*', { count: 'exact' })
+    .order('name', { ascending: true })
+    .range(offset, offset + itemsPerPage - 1);
+
+  if (searchQuery) {
+    query = query.or(`name.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%,website_url.ilike.%${searchQuery}%`);
+  }
+
+  const { data, error, count } = await query;
+  
   if (error) throw new Error(error.message);
-  return data;
+  
+  return {
+    shops: data || [],
+    totalCount: count || 0
+  };
 }
 
 async function deleteShop(shopId: string) {
@@ -47,12 +71,22 @@ async function deleteShop(shopId: string) {
 
 export const ShopsAdmin = () => {
   const queryClient = useQueryClient();
-  const { data: shops, isLoading, error } = useQuery({ queryKey: ['shopsAdmin'], queryFn: fetchShops });
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [shopToDelete, setShopToDelete] = useState<Shop | null>(null);
+
+  const { data: shopsData, isLoading, error } = useQuery({
+    queryKey: ['shopsAdmin', currentPage, itemsPerPage, searchQuery],
+    queryFn: () => fetchShops(currentPage, itemsPerPage, searchQuery),
+  });
+
+  const shops = shopsData?.shops || [];
+  const totalCount = shopsData?.totalCount || 0;
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   const deleteMutation = useMutation({
     mutationFn: deleteShop,
@@ -89,6 +123,20 @@ export const ShopsAdmin = () => {
     }
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
+
   if (isLoading) return <div>Loading shops...</div>;
   if (error) return <div>Error loading shops: {error.message}</div>;
 
@@ -97,10 +145,17 @@ export const ShopsAdmin = () => {
       <Card className="mt-4">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>All Shops</CardTitle>
-          <Button onClick={handleAddNew}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add New Shop
-          </Button>
+          <div className="flex items-center gap-4">
+            <AdminSearch
+              placeholder="Search shops..."
+              onSearch={handleSearch}
+              className="w-64"
+            />
+            <Button onClick={handleAddNew}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add New Shop
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -113,7 +168,7 @@ export const ShopsAdmin = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {shops?.map((shop: Shop) => (
+              {shops.map((shop: Shop) => (
                 <TableRow key={shop.id}>
                   <TableCell className="font-medium">{shop.name}</TableCell>
                   <TableCell>
@@ -150,6 +205,15 @@ export const ShopsAdmin = () => {
               ))}
             </TableBody>
           </Table>
+          
+          <AdminPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalCount}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
         </CardContent>
       </Card>
 
