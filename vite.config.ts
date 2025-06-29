@@ -1,9 +1,7 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-import vike from 'vike/plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -13,9 +11,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    vike({
-      prerender: true
-    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -24,7 +19,4 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  ssr: {
-    noExternal: ['@supabase/supabase-js']
-  }
 }));
