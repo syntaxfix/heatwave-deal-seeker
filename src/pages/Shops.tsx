@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Store, ExternalLink } from 'lucide-react';
-import { Link } from './Link';
+import { Link } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 
@@ -69,16 +69,16 @@ const Shops = () => {
         title="All Shops - Spark.deals | Browse Popular Stores"
         description="Browse all shops and stores on Spark.deals. Find deals from your favorite retailers and discover new brands with exclusive discounts."
         keywords="shops, stores, retailers, brands, deals, discounts"
-        canonical={`${typeof window !== 'undefined' ? window.location.origin : ''}/shops`}
+        canonical={`${window.location.origin}/shops`}
         ogTitle="All Shops - Spark.deals"
         ogDescription="Browse all shops and stores on Spark.deals"
-        ogUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/shops`}
+        ogUrl={`${window.location.origin}/shops`}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           "name": "All Shops",
           "description": "Collection of shops and stores offering deals",
-          "url": `${typeof window !== 'undefined' ? window.location.origin : ''}/shops`
+          "url": `${window.location.origin}/shops`
         }}
       />
       <Header />
@@ -181,7 +181,7 @@ const Shops = () => {
                     
                     <div className="flex space-x-2">
                       <Button asChild className="limited-time-gradient flex-1">
-                        <Link href={`/shop/${shop.slug}`}>
+                        <Link to={`/shop/${shop.slug}`}>
                           View Deals
                         </Link>
                       </Button>
